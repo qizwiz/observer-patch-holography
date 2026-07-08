@@ -1,4 +1,6 @@
 import Mathlib
+import ObserverPatchHolography.YangMillsLemma72
+import ObserverPatchHolography.YangMillsProp81
 
 /-!
 # Yang–Mills finite repair-gap — setup + Theorem 7.3 / Lemma 7.4 assembly
@@ -27,20 +29,26 @@ uniform hidden-fiber symmetry, commuting colors, and a finite active-collar
 type set — are exactly those premises, and they are discharged **nowhere** in
 Lean. This file proves `structure ⇒ finite gap`, honestly and no more.
 
-Two things are deliberately **NOT** proved and **NOT** claimed:
+One thing is deliberately **NOT** proved and **NOT** claimed:
 
 * `Δ_YM = Δ_rep`. This is Müller's **Assumption 9.2** — the continuum
   certificate (Schwinger-function convergence, reflection positivity,
   Osterwalder–Schrader reconstruction, non-triviality). It is the genuine open
   problem and is **untouched**. The deliverable here is `Δ_rep`, the
   finite-stage *representation* gap — **not** the physical Yang–Mills mass gap.
-* The two keystone lemmas this file *assembles* live in sibling modules and
-  appear here as **named `sorry`s**:
-    - `lemma_7_2` — scalar relaxation on a uniform hidden fiber (each `c_C > 0`);
-    - `prop_8_1`  — commuting-color finite-stage gap (`commuting ⇒ gap`).
-  This file is the **setup + Theorem 7.3 / Lemma 7.4 assembly**; the assembly
-  proof itself (`thm_7_3_finite_gap`) is complete and axiom-free *modulo* those
-  two named imports.
+
+The two keystone lemmas this file *assembles* are proved in sibling modules and
+**imported** here (no `sorry`s remain):
+
+* `lemma_7_2` — scalar relaxation on a uniform hidden fiber (each `c_C > 0`);
+  proved in `ObserverPatchHolography.YangMillsLemma72` (extracted verbatim from
+  the frozen single-file artifact `RepairGap.lean`, Part I);
+* `prop_8_1`  — commuting-color finite-stage gap (`commuting ⇒ gap`);
+  proved in `ObserverPatchHolography.YangMillsProp81`.
+
+This file is the **setup + Theorem 7.3 / Lemma 7.4 assembly**; with the
+keystone imports wired, `thm_7_3_finite_gap` carries zero `sorry`s and no
+project-level axioms.
 -/
 
 namespace ObserverPatchHolography.YangMillsGap
@@ -57,16 +65,18 @@ noncomputable def EF (F : Type*) [Fintype F] : Matrix F F ℝ :=
     group `S_F` (every permutation matrix) and with kernel exactly the constants,
     is a *strictly positive scalar* multiple of `I − E_F`.
 
-    Proved in the sibling keystone module via the commutant of the permutation
-    representation (`commutant_perm_two_valued` + Schur on the standard rep).
-    A named `sorry` here — this file is the assembly, not the keystone. -/
+    Proved in the sibling keystone module `YangMillsLemma72` via the commutant
+    of the permutation representation (`commutant_perm_two_valued` + Schur on
+    the standard rep); discharged here by direct import — this file is the
+    assembly, not the keystone. (The two `EF` definitions are token-identical,
+    hence definitionally equal.) -/
 theorem lemma_7_2 {F : Type*} [Fintype F] [DecidableEq F]
     (hF : 2 ≤ Fintype.card F) (D : Matrix F F ℝ)
     (hPSD : D.PosSemidef)
     (hComm : ∀ σ : Equiv.Perm F, Commute (σ.permMatrix ℝ) D)
     (hKer : ∀ v : F → ℝ, D.mulVec v = 0 ↔ ∃ c : ℝ, v = fun _ => c) :
-    ∃ cF : ℝ, 0 < cF ∧ D = cF • ((1 : Matrix F F ℝ) - EF F) := by
-  sorry -- IMPORTED: keystone Lemma 7.2 (sibling module)
+    ∃ cF : ℝ, 0 < cF ∧ D = cF • ((1 : Matrix F F ℝ) - EF F) :=
+  ObserverPatchHolography.YangMillsLemma72.lemma_7_2 hF D hPSD hComm hKer
 
 /-- The per-collar consequence of Lemma 7.2 that the assembly actually consumes:
     each active collar has a **strictly positive** relaxation rate. This
@@ -100,15 +110,16 @@ noncomputable def repairGenerator {ι : Type*} (s : Finset ι)
     projection `P₀` onto the joint fixed (constants) space, the constant-rate
     generator `∑ c_* · (I − E_C)` dominates `c_* · (I − P₀)`.
 
-    Proved in the sibling gap module via `1 − ∏ Eₐ ≤ ∑ (1 − Eₐ)` for a commuting
-    family of star projections. A named `sorry` here. -/
+    Proved in the sibling gap module `YangMillsProp81` via `1 − ∏ Eₐ ≤ ∑ (1 − Eₐ)`
+    for a commuting family of star projections; discharged here by direct
+    import. -/
 theorem prop_8_1 {ι : Type*} (s : Finset ι) (Ec : ι → (E →L[ℝ] E)) (P0 : E →L[ℝ] E)
     (hE : ∀ a ∈ s, IsStarProjection (Ec a))
     (hc : (↑s : Set ι).Pairwise (Function.onFun Commute Ec))
     (hprod : s.noncommProd Ec hc = P0)
     {cstar : ℝ} (hcpos : 0 < cstar) :
-    cstar • ((1 : E →L[ℝ] E) - P0) ≤ ∑ a ∈ s, cstar • ((1 : E →L[ℝ] E) - Ec a) := by
-  sorry -- IMPORTED: Prop 8.1 gap engine (sibling module)
+    cstar • ((1 : E →L[ℝ] E) - P0) ≤ ∑ a ∈ s, cstar • ((1 : E →L[ℝ] E) - Ec a) :=
+  ObserverPatchHolography.YangMillsProp81.prop_8_1 s Ec P0 hE hc hprod hcpos
 
 /-! ## §7.4 uniform floor -/
 

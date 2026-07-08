@@ -1,6 +1,9 @@
 import ObserverPatchHolography.AbstractRewriting
 import ObserverPatchHolography.Primitives
 import ObserverPatchHolography.Rule90
+import ObserverPatchHolography.YangMillsLemma72
+import ObserverPatchHolography.YangMillsProp81
+import ObserverPatchHolography.YangMillsGap
 
 /-!
 # Observer-Patch Holography — Lean 4 library root
