@@ -55,6 +55,7 @@ variable {F : Type*} [Fintype F] [DecidableEq F]
 noncomputable def EF (F : Type*) [Fintype F] : Matrix F F ℝ :=
   (Fintype.card F : ℝ)⁻¹ • Matrix.of (fun _ _ => (1 : ℝ))
 
+omit [DecidableEq F] in
 @[simp] lemma EF_apply (i j : F) : EF F i j = (Fintype.card F : ℝ)⁻¹ := by
   simp [EF, Matrix.smul_apply, Matrix.of_apply, smul_eq_mul]
 
@@ -62,6 +63,7 @@ noncomputable def EF (F : Type*) [Fintype F] : Matrix F F ℝ :=
     Given two distinct source points and two distinct target points, there is a permutation
     taking the first pair to the second.  Built as a two-swap composition, so no appeal to
     the packaged `isMultiplyPretransitive` machinery is needed. -/
+omit [Fintype F] in
 theorem exists_perm_maps_two {i j i' j' : F} (hij : i ≠ j) (hij' : i' ≠ j') :
     ∃ σ : Equiv.Perm F, σ i = i' ∧ σ j = j' := by
   refine ⟨Equiv.swap (Equiv.swap i i' j) j' * Equiv.swap i i', ?_, ?_⟩

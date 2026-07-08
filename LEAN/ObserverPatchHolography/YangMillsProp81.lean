@@ -55,7 +55,7 @@ namespace ObserverPatchHolography.YangMillsProp81
 
 open scoped RealInnerProductSpace
 
-/-- Finite-dimensional **real** inner product space (Hilbert space): the carrier
+/-! Finite-dimensional **real** inner product space (Hilbert space): the carrier
 of the repair generator. `CompleteSpace` is automatic for a finite-dimensional
 real space; we carry it explicitly to match the sibling assembly module and to
 feed the `CompleteSpace`-gated positivity lemmas directly. -/
@@ -69,6 +69,7 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
 one-liners from `le_def` + the additive/scalar positivity API. -/
 
 /-- Left-add monotonicity for the Loewner order: `a ≤ b → c + a ≤ c + b`. -/
+omit [FiniteDimensional ℝ E] [CompleteSpace E] in
 private lemma add_le_add_left_clm {a b : E →L[ℝ] E} (h : a ≤ b) (c : E →L[ℝ] E) :
     c + a ≤ c + b := by
   rw [ContinuousLinearMap.le_def] at h ⊢
@@ -77,6 +78,7 @@ private lemma add_le_add_left_clm {a b : E →L[ℝ] E} (h : a ≤ b) (c : E →
 
 /-- Nonnegative-scalar monotonicity for the Loewner order: `a ≤ b → 0 ≤ c →
 `c • a ≤ c • b`. -/
+omit [FiniteDimensional ℝ E] [CompleteSpace E] in
 private lemma smul_le_smul_clm {a b : E →L[ℝ] E} (h : a ≤ b) {c : ℝ} (hc : 0 ≤ c) :
     c • a ≤ c • b := by
   rw [ContinuousLinearMap.le_def] at h ⊢
@@ -92,6 +94,7 @@ private lemma smul_le_smul_clm {a b : E →L[ℝ] E} (h : a ≤ b) {c : ℝ} (hc
 Proof: `((I−p)+(I−q)) − (I−p·q) = (I−p)·(I−q)`, and the product of the two
 commuting star projections `I−p`, `I−q` is again a star projection, hence a
 positive operator. -/
+omit [FiniteDimensional ℝ E] in
 theorem two_proj_le {p q : E →L[ℝ] E}
     (hp : IsStarProjection p) (hq : IsStarProjection q) (h : Commute p q) :
     (1 - p * q) ≤ (1 - p) + (1 - q) := by
@@ -111,6 +114,7 @@ projections is itself a star projection (hence an orthogonal projection onto the
 joint fixed space `⋂ Ran(p a)`). Induction on `s` via `Finset.cons_induction`;
 each step is `IsStarProjection.mul`, whose commutativity side-condition comes from
 `noncommProd_commute`. -/
+omit [FiniteDimensional ℝ E] in
 theorem noncommProd_isStarProjection {ι : Type*} (p : ι → E →L[ℝ] E) :
     ∀ (s : Finset ι) (_hp : ∀ a ∈ s, IsStarProjection (p a))
       (hc : (↑s : Set ι).Pairwise (Function.onFun Commute p)),
@@ -146,7 +150,7 @@ commuting pair `(p a, ∏_t)` (the tail product is a star projection by
 `noncommProd_isStarProjection`, and commutes with `p a` by `noncommProd_commute`),
 then the inductive hypothesis on the tail via left-add monotonicity. -/
 theorem one_sub_noncommProd_le_sum {ι : Type*} (p : ι → E →L[ℝ] E) :
-    ∀ (s : Finset ι) (hp : ∀ a ∈ s, IsStarProjection (p a))
+    ∀ (s : Finset ι) (_hp : ∀ a ∈ s, IsStarProjection (p a))
       (hc : (↑s : Set ι).Pairwise (Function.onFun Commute p)),
       (1 - s.noncommProd p hc) ≤ ∑ a ∈ s, (1 - p a) := by
   intro s
@@ -210,7 +214,7 @@ theorem prop_8_1_gap {ι : Type*} (s : Finset ι) (Ec : ι → (E →L[ℝ] E)) 
     (hc : (↑s : Set ι).Pairwise (Function.onFun Commute Ec))
     (hprod : s.noncommProd Ec hc = P0)
     {cstar : ℝ} (hcpos : 0 < cstar) (x : E) (hx : P0 x = 0) :
-    cstar * ‖x‖ ^ 2 ≤ ⟪(∑ a ∈ s, cstar • ((1 : E →L[ℝ] E) - Ec a)) x, x⟫_ℝ := by
+    cstar * ‖x‖ ^ 2 ≤ inner ℝ ((∑ a ∈ s, cstar • ((1 : E →L[ℝ] E) - Ec a)) x) x := by
   have hle : cstar • ((1 : E →L[ℝ] E) - P0) ≤ ∑ a ∈ s, cstar • ((1 : E →L[ℝ] E) - Ec a) :=
     prop_8_1 s Ec P0 hE hc hprod hcpos
   rw [ContinuousLinearMap.le_def] at hle
