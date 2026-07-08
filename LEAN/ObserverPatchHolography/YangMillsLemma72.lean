@@ -28,13 +28,19 @@ problem and is **untouched, unassumed, unclaimed**.
 
 ## Integration
 
-Extracted verbatim from the frozen single-file artifact `RepairGap.lean`
-(Part I) so the assembly module `ObserverPatchHolography.YangMillsGap` can
-discharge its `lemma_7_2` obligation by direct import:
+Extracted verbatim from the retired single-file artifact `RepairGap.lean`
+(Part I; now consolidated into these modules — see git history) so the assembly
+module `ObserverPatchHolography.YangMillsGap` can discharge its `lemma_7_2`
+obligation by direct import:
 ```
 exact ObserverPatchHolography.YangMillsLemma72.lemma_7_2 hF D hPSD hComm hKer
 ```
 (the two `EF` definitions are token-identical, hence definitionally equal).
+
+SCOPE, verbatim: Machine-checked: the finite representation gap Δ_rep ≥ c_* > 0
+(Lemma 7.2 / Lemma 7.4 / Prop 8.1 / Thm 7.3 assembly) and the conditional
+reduction "Assumption 9.2 + finite gap ⇒ Δ_YM ≥ c_*". Assumption 9.2 itself is
+stated as an explicit hypothesis and is not touched.
 -/
 
 open scoped Matrix
@@ -199,5 +205,15 @@ theorem lemma_7_2
     by_cases h : i = j
     · rw [if_pos h, if_pos h, ha_eq]; field_simp; ring
     · rw [if_neg h, if_neg h, ha_eq]; field_simp; ring
+
+/-! ## Axiom self-audit (build-log visible)
+
+Expected report for every theorem below: exactly
+`[propext, Classical.choice, Quot.sound]` — no `sorryAx`, no project axiom. -/
+
+#print axioms exists_perm_maps_two
+#print axioms perm_conj_invariant
+#print axioms commutant_perm_two_valued
+#print axioms lemma_7_2
 
 end ObserverPatchHolography.YangMillsLemma72

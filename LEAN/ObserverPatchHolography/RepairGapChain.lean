@@ -18,14 +18,20 @@
       Discharging them is the genuine open frontier (constructive QFT); this file does not
       touch it and does not claim to.
     * The finite gap (Prop 8.1: commuting-color projections ⟹ Δ_rep ≥ c_*) is the
-      unconditional input; its operator-theoretic proof is a separate Mathlib-typed
-      artifact (RepairGap.lean). Here it enters as the `Lrep_gap` hypothesis.
+      unconditional input; its operator-theoretic proof lives in the sibling
+      Mathlib-typed modules (`YangMillsLemma72`, `YangMillsProp81`, `YangMillsGap`).
+      Here it enters as the `Lrep_gap` hypothesis.
 
   What this file BUYS: a machine check that the paper's conditional claim is logically
-  valid — the reduction of the Clay mass gap to Assumption 9.2 is sound.
+  valid — the reduction of the mass-gap claim to Assumption 9.2 is sound.
+
+  SCOPE, verbatim: Machine-checked: the finite representation gap Δ_rep ≥ c_* > 0
+  (Lemma 7.2 / Lemma 7.4 / Prop 8.1 / Thm 7.3 assembly) and the conditional reduction
+  "Assumption 9.2 + finite gap ⇒ Δ_YM ≥ c_*". Assumption 9.2 itself is stated as an
+  explicit hypothesis and is not touched.
 -/
 
-namespace OPHYangMills
+namespace ObserverPatchHolography.RepairGapChain
 
 /-- Minimal order structure — exactly the two order facts the mass-gap chain uses.
     (Kept self-contained instead of importing Mathlib's `Preorder`.) -/
@@ -119,4 +125,13 @@ example :
       spec_eq := fun _ => Iff.rfl }
     7 (by show (5 : Int) ≤ 7; omega)
 
-end OPHYangMills
+/-! ## Axiom self-audit (build-log visible)
+
+`mass_gap` / `mass_gap_pos` / `gap_eq` are pure logic over the `Certificate`
+hypotheses — expected axiom report: NONE (not even propext). -/
+
+#print axioms mass_gap
+#print axioms mass_gap_pos
+#print axioms gap_eq
+
+end ObserverPatchHolography.RepairGapChain

@@ -39,11 +39,16 @@ projections. That fact is the real residue; the "mass gap" is rhetoric around it
 
 The sibling `ObserverPatchHolography.YangMillsGap` assembly module states
 `prop_8_1` (and `thm_7_3_finite_gap`) with the **identical** signature carried
-here and currently leaves `prop_8_1` as a named `sorry`. That obligation is
-discharged by `ObserverPatchHolography.YangMillsProp81.prop_8_1` below:
+here; its `prop_8_1` obligation is discharged by direct import of
+`ObserverPatchHolography.YangMillsProp81.prop_8_1` below:
 ```
 exact ObserverPatchHolography.YangMillsProp81.prop_8_1 s Ec P0 hE hc hprod hcpos
 ```
+
+SCOPE, verbatim: Machine-checked: the finite representation gap Δ_rep ≥ c_* > 0
+(Lemma 7.2 / Lemma 7.4 / Prop 8.1 / Thm 7.3 assembly) and the conditional
+reduction "Assumption 9.2 + finite gap ⇒ Δ_YM ≥ c_*". Assumption 9.2 itself is
+stated as an explicit hypothesis and is not touched.
 -/
 
 namespace ObserverPatchHolography.YangMillsProp81
@@ -217,5 +222,17 @@ theorem prop_8_1_gap {ι : Type*} (s : Finset ι) (Ec : ι → (E →L[ℝ] E)) 
       ContinuousLinearMap.sub_apply, ContinuousLinearMap.one_apply, hx, sub_zero]
   rw [happ, inner_sub_left, real_inner_smul_left, real_inner_self_eq_norm_sq] at hnn
   linarith
+
+/-! ## Axiom self-audit (build-log visible)
+
+Expected report for every theorem below: exactly
+`[propext, Classical.choice, Quot.sound]` — no `sorryAx`, no project axiom. -/
+
+#print axioms two_proj_le
+#print axioms noncommProd_isStarProjection
+#print axioms one_sub_noncommProd_le_sum
+#print axioms prod_isStarProjection
+#print axioms prop_8_1
+#print axioms prop_8_1_gap
 
 end ObserverPatchHolography.YangMillsProp81

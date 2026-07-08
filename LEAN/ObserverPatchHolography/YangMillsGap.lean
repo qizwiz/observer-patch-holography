@@ -42,13 +42,20 @@ The two keystone lemmas this file *assembles* are proved in sibling modules and
 
 * `lemma_7_2` — scalar relaxation on a uniform hidden fiber (each `c_C > 0`);
   proved in `ObserverPatchHolography.YangMillsLemma72` (extracted verbatim from
-  the frozen single-file artifact `RepairGap.lean`, Part I);
+  the retired single-file artifact `RepairGap.lean`, Part I — that file is now
+  consolidated into these modules; see git history for the original);
 * `prop_8_1`  — commuting-color finite-stage gap (`commuting ⇒ gap`);
   proved in `ObserverPatchHolography.YangMillsProp81`.
 
 This file is the **setup + Theorem 7.3 / Lemma 7.4 assembly**; with the
 keystone imports wired, `thm_7_3_finite_gap` carries zero `sorry`s and no
-project-level axioms.
+project-level axioms. The conditional continuum chain lives in the sibling
+`ObserverPatchHolography.RepairGapChain`.
+
+SCOPE, verbatim: Machine-checked: the finite representation gap Δ_rep ≥ c_* > 0
+(Lemma 7.2 / Lemma 7.4 / Prop 8.1 / Thm 7.3 assembly) and the conditional
+reduction "Assumption 9.2 + finite gap ⇒ Δ_YM ≥ c_*". Assumption 9.2 itself is
+stated as an explicit hypothesis and is not touched.
 -/
 
 namespace ObserverPatchHolography.YangMillsGap
@@ -180,5 +187,17 @@ theorem thm_7_3_finite_gap {ι : Type*} (s : Finset ι) (hne : s.Nonempty)
   -- Assemble: c_* (I − P₀) ≤ ∑ c_* (I − E_C) ≤ ∑ c_C (I − E_C) = L_r^rep.
   show cstar • ((1 : E →L[ℝ] E) - P0) ≤ ∑ a ∈ s, rate a • ((1 : E →L[ℝ] E) - Ec a)
   exact le_trans step1 step2
+
+/-! ## Axiom self-audit (build-log visible)
+
+Expected report for every theorem below: exactly
+`[propext, Classical.choice, Quot.sound]` — the three standard Mathlib axioms,
+no `sorryAx`, no project-level axiom. -/
+
+#print axioms lemma_7_2
+#print axioms collar_rate_pos
+#print axioms prop_8_1
+#print axioms uniform_floor
+#print axioms thm_7_3_finite_gap
 
 end ObserverPatchHolography.YangMillsGap
