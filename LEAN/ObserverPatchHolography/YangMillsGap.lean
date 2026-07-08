@@ -98,10 +98,14 @@ theorem collar_rate_pos {F : Type*} [Fintype F] [DecidableEq F]
   let ⟨cF, hpos, _⟩ := lemma_7_2 hF D hPSD hComm hKer
   ⟨cF, hpos⟩
 
-/-! ## Operator setup: a finite-dimensional real inner-product space -/
+/-! ## Operator setup: a real Hilbert space
+
+(The paper's application is finite-dimensional, whence complete; only
+completeness is consumed by the Loewner/positivity machinery, so we
+hypothesize exactly that — the finite-dimensional case is an instance.) -/
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-  [FiniteDimensional ℝ E] [CompleteSpace E]
+  [CompleteSpace E]
 
 /-- **The repair generator** `L_r^rep = ∑_{C ∈ s} c_C · (I − E_C)` over a finite
     active-collar index set `s`, with per-collar orthogonal projections `Ec` and

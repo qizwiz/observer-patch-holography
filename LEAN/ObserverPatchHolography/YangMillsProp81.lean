@@ -7,8 +7,10 @@ Formalisation of the **finite, real** §8 payoff of B. Müller, *Explaining the
 Yang–Mills Mass Gap with Observer-Patch Repair Dynamics* (r1515):
 
 > **Proposition 8.1.** Let `{Eₐ}_{a∈s}` be a finite family of **mutually
-> commuting** orthogonal (star) projections on a finite-dimensional real inner
-> product space, and let `P₀ = ∏ₐ Eₐ` be their (non-commutative) product — the
+> commuting** orthogonal (star) projections on a real Hilbert space (the
+> paper's case is finite-dimensional — formalized in the natural generality,
+> only completeness is consumed), and let `P₀ = ∏ₐ Eₐ` be their
+> (non-commutative) product — the
 > orthogonal projection onto the joint fixed space `⋂ₐ Ran Eₐ` (the "constants").
 > Then for any constant rate `c_* > 0`,
 > `      c_* · (I − P₀)  ≤  ∑ₐ c_* · (I − Eₐ),`
@@ -55,12 +57,12 @@ namespace ObserverPatchHolography.YangMillsProp81
 
 open scoped RealInnerProductSpace
 
-/-! Finite-dimensional **real** inner product space (Hilbert space): the carrier
-of the repair generator. `CompleteSpace` is automatic for a finite-dimensional
-real space; we carry it explicitly to match the sibling assembly module and to
-feed the `CompleteSpace`-gated positivity lemmas directly. -/
+/-! **Real Hilbert space** carrier of the repair generator. In the paper's
+application `E` is finite-dimensional (whence complete), but only completeness
+is actually consumed by the positivity/Loewner machinery — so we hypothesize
+exactly `[CompleteSpace E]` and the finite-dimensional case is an instance. -/
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-  [FiniteDimensional ℝ E] [CompleteSpace E]
+  [CompleteSpace E]
 
 /-! ## Loewner-order plumbing on `E →L[ℝ] E`
 
@@ -68,17 +70,17 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
 `f ≤ g ↔ (g − f).IsPositive`). We only need two monotonicity facts; both are
 one-liners from `le_def` + the additive/scalar positivity API. -/
 
+omit [CompleteSpace E] in
 /-- Left-add monotonicity for the Loewner order: `a ≤ b → c + a ≤ c + b`. -/
-omit [FiniteDimensional ℝ E] [CompleteSpace E] in
 private lemma add_le_add_left_clm {a b : E →L[ℝ] E} (h : a ≤ b) (c : E →L[ℝ] E) :
     c + a ≤ c + b := by
   rw [ContinuousLinearMap.le_def] at h ⊢
   have e : (c + b) - (c + a) = b - a := by abel
   rwa [e]
 
+omit [CompleteSpace E] in
 /-- Nonnegative-scalar monotonicity for the Loewner order: `a ≤ b → 0 ≤ c →
 `c • a ≤ c • b`. -/
-omit [FiniteDimensional ℝ E] [CompleteSpace E] in
 private lemma smul_le_smul_clm {a b : E →L[ℝ] E} (h : a ≤ b) {c : ℝ} (hc : 0 ≤ c) :
     c • a ≤ c • b := by
   rw [ContinuousLinearMap.le_def] at h ⊢
@@ -94,7 +96,6 @@ private lemma smul_le_smul_clm {a b : E →L[ℝ] E} (h : a ≤ b) {c : ℝ} (hc
 Proof: `((I−p)+(I−q)) − (I−p·q) = (I−p)·(I−q)`, and the product of the two
 commuting star projections `I−p`, `I−q` is again a star projection, hence a
 positive operator. -/
-omit [FiniteDimensional ℝ E] in
 theorem two_proj_le {p q : E →L[ℝ] E}
     (hp : IsStarProjection p) (hq : IsStarProjection q) (h : Commute p q) :
     (1 - p * q) ≤ (1 - p) + (1 - q) := by
@@ -114,7 +115,6 @@ projections is itself a star projection (hence an orthogonal projection onto the
 joint fixed space `⋂ Ran(p a)`). Induction on `s` via `Finset.cons_induction`;
 each step is `IsStarProjection.mul`, whose commutativity side-condition comes from
 `noncommProd_commute`. -/
-omit [FiniteDimensional ℝ E] in
 theorem noncommProd_isStarProjection {ι : Type*} (p : ι → E →L[ℝ] E) :
     ∀ (s : Finset ι) (_hp : ∀ a ∈ s, IsStarProjection (p a))
       (hc : (↑s : Set ι).Pairwise (Function.onFun Commute p)),
