@@ -4,6 +4,7 @@ import ObserverPatchHolography.Rule90
 import ObserverPatchHolography.YangMillsLemma72
 import ObserverPatchHolography.YangMillsProp81
 import ObserverPatchHolography.YangMillsGap
+import ObserverPatchHolography.YangMillsGapWitness
 import ObserverPatchHolography.RepairGapChain
 
 /-!
@@ -19,6 +20,9 @@ engine), `YangMillsGap` (Thm 7.3 / Lemma 7.4 assembly), and `RepairGapChain`
 gap Δ_rep ≥ c_* > 0 (Lemma 7.2 / Lemma 7.4 / Prop 8.1 / Thm 7.3 assembly) and
 the conditional reduction "Assumption 9.2 + finite gap ⇒ Δ_YM ≥ c_*".
 Assumption 9.2 itself is stated as an explicit hypothesis and is not touched.
+`YangMillsGapWitness` (`thm_7_3_finite_gap_nonvacuous`) certifies that the Thm 7.3
+premise bundle is jointly satisfiable on a concrete complete real inner-product
+space, so the finite-gap theorem is not vacuous.
 
 **Current state is a preliminary skeleton, not a theorem-grade
 formalisation of Proposition 4.2** from *Paradise as Fixed-Point
