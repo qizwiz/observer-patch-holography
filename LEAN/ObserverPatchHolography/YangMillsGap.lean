@@ -85,10 +85,15 @@ theorem lemma_7_2 {F : Type*} [Fintype F] [DecidableEq F]
     ∃ cF : ℝ, 0 < cF ∧ D = cF • ((1 : Matrix F F ℝ) - EF F) :=
   ObserverPatchHolography.YangMillsLemma72.lemma_7_2 hF D hPSD hComm hKer
 
-/-- The per-collar consequence of Lemma 7.2 that the assembly actually consumes:
-    each active collar has a **strictly positive** relaxation rate. This
-    genuinely invokes `lemma_7_2` (extracts its `0 < cF`), realising the
-    "each `c_C > 0`" input to the assembly. -/
+/-- Convenience projection of `lemma_7_2` down to its positivity component.
+
+    **Read the statement, not the proof.** The conclusion `∃ cF, 0 < cF` mentions none of the
+    hypotheses and is provable by `⟨1, by norm_num⟩` alone, so as a *statement* this carries no
+    information: it is a weaker sibling of the re-export directly above, which keeps the real content
+    `D = cF • (1 - EF F)`. The proof does invoke `lemma_7_2`, but a reader auditing statements would
+    be misled by that. Nothing in the assembly consumes this lemma (an earlier docstring claimed it
+    did, which was false); it is retained only as a named entry point for `#print axioms`. Prefer
+    `lemma_7_2` — or the full-strength re-export above — for any real use. -/
 theorem collar_rate_pos {F : Type*} [Fintype F] [DecidableEq F]
     (hF : 2 ≤ Fintype.card F) (D : Matrix F F ℝ)
     (hPSD : D.PosSemidef)
