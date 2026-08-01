@@ -1,18 +1,25 @@
 # Independent audit — the OPH → Yang–Mills repair-gap chain
 
-**Audited commit:** `25e29d12` (branch `ym-finite-gap`)
+**Audited Lean commit:** `25e29d12` (branch `ym-finite-gap`)
+**Audited paper commit:** `940e95c` (`origin/main` of FloatingPragma/observer-patch-holography)
 **Date:** 2026-08-01
 **Auditor:** Claude Opus 5, at JH's request. Every gate below was run by the auditor on
 `rule30box`; nothing in this document is relayed from a build receipt or from the authors.
 
-**An audit is only valid for the commit it names.** If `Lean/` moves, this document is a
-historical record, not a current verdict.
+**An audit is only valid for the commits it names — BOTH of them.** A statement map compares two
+artifacts, so it is stale if either the Lean or the paper moves. The first pass of this document
+hashed only the Lean and was wrong within the hour; see the CORRECTION below.
 
 ---
 
 ## Verdict
 
-**PROVES-AS-CLAIMED**, for what it claims — which is a *conditional* chain, and says so in three
+**PROVES-AS-CLAIMED for §11. §8 NO LONGER MATCHES THE PAPER** — see the correction box below.
+
+The chain is sound and axiom-clean; the drift is that the paper's §8 was rewritten and the Lean
+still formalises the superseded version.
+
+For §11, PROVES-AS-CLAIMED for what it claims — which is a *conditional* chain, and says so in three
 independent places (paper §11 title, `claims/claim_registry.yaml` tier, Lean module docstring).
 
 No WEAKER-SIBLING, no MISSING, no aspirational naming. The failure mode this audit exists to
@@ -20,6 +27,37 @@ catch — a green build masking a substituted or weakened statement — is **not
 
 Two scoping limits are recorded in §4. Neither is a defect; both are places where the Lean
 formalises less than the paper text, consistently with its own declared scope.
+
+---
+
+## CORRECTION (same day, before this document was trusted)
+
+The first pass of this audit read the paper from a local checkout **533 commits stale**
+(`df105ed`). Fetching `origin/main` (`940e95c`) shows the paper's §8 was **rewritten and renamed**:
+
+| | old `df105ed` — what the Lean formalises | current `940e95c` |
+|---|---|---|
+| name | *Special commuting-color finite-stage repair gap* | *Uniform collar-projection and transfer gap* |
+| environment | `proposition` | `theorem` |
+| hypothesis | bounded-color family, expectations **commute** | admissible collar tower + ground-state-transform receipt |
+| constant | `c_*` | `δ_* := c_*(1−η_*) = c_*/A_*` |
+| conclusion | `L_r ≥ c_*(I−P_{0,r})` | `L_{r,b} ≥ δ_*(I−P_{0,r,b})` **and** `‖e^{−tL}−P_0‖ ≤ e^{−tδ_*}` |
+| method | commuting orthogonal projections | **Dobrushin comparison** via (G3) |
+
+`"commuting-color"` occurs **5 times** in the old paper and **0 times** in the current one. The old
+text already called it *"a special certificate, not the generic repair-generator"*; the current
+paper proves the general case directly and drops the special one.
+
+**Consequence:** `YangMillsProp81.prop_8_1` is still correct and axiom-clean — it proves exactly
+what it states — but it formalises a statement the paper **no longer makes**. The §8 row in the
+statement map below describes the *old* paper and is retained only as a record of that mapping.
+
+**§11 is unaffected.** The Main Theorem changed only its constant (`c_*` → `δ_*`), and
+`RepairGapChain.mass_gap` is generic in `c_star`, so the rename does not touch it.
+
+**The auditor's error, recorded:** the first pass bound the *Lean* to a commit and never bound the
+*paper*. This document said "an audit is only valid for the commit it names" while naming only one
+of the two artifacts it compares. A statement map has two sides and both need a hash.
 
 ---
 
@@ -70,7 +108,7 @@ Claim source located via `claims/claim_registry.yaml`, entry `OPH-YM-GAP`, which
 Section numbering in that paper is real, not decorative: **§8** *Finite-Stage Gap*, **§11**
 *Main Theorem*, **§12** *Exact Gap Accounting* — the three the Lean cites by number.
 
-### §8, Prop 8.1 (`prop:finite-gap`) → `YangMillsProp81.prop_8_1` — **MATCH**
+### §8, Prop 8.1 → `prop_8_1` — **MATCHED `df105ed`; SUPERSEDED at `940e95c`** (see correction)
 
 | paper                                            | Lean                                            |
 |--------------------------------------------------|-------------------------------------------------|
