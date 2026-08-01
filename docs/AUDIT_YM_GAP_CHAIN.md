@@ -59,6 +59,32 @@ statement map below describes the *old* paper and is retained only as a record o
 *paper*. This document said "an audit is only valid for the commit it names" while naming only one
 of the two artifacts it compares. A statement map has two sides and both need a hash.
 
+### When the drift happened — dated from the authors' own release (added same day)
+
+The paper is also circulated as a PDF in the OPH Telegram streams. Pulling the most recent drop
+(`OPH R&D and Audit`, 2026-07-05, msg #1273) dates the rewrite instead of merely observing it:
+
+    Draft of May 16, 2026 -- Paper release: r1515 -- Released: July 6, 2026
+    §8: "Proposition 8.1 (Special commuting-color finite-stage repair gap)"   <- VERBATIM
+    commuting-color 2 - commuting 5 - Dobrushin 0 - collar-projection 0
+
+| version                        | date   | `commuting-color` | §8 method             |
+|--------------------------------|--------|-------------------|-----------------------|
+| `df105ed` (stale local)        | —      | 5                 | commuting projections |
+| **r1515 PDF (Telegram)**       | Jul 6  | 2                 | commuting projections |
+| `940e95c` (`origin/main`)      | Aug 1  | 0                 | Dobrushin comparison  |
+
+**This materially softens the finding.** The Lean did not formalise a long-dead statement — it
+matched the RELEASED paper as of four weeks ago, and the replacement landed between Jul 6 and
+Aug 1 (the paper was committed twice on Aug 1, one of them `"Paper consistency audit updates"`).
+`prop_8_1` is a correct formalisation of a statement that was current when it was written. That is
+ordinary drift against a moving upstream, not a defect in the formalisation.
+
+*Method note:* the PDF was fetched over MTProto rather than by driving the Telegram UI, and the
+text read with `pdftotext`. A hand-rolled PDF stream extractor was tried first and reported
+`mass gap: 0` in a mass-gap paper — the harness was broken, not the document. When an extraction
+disagrees with the title of the thing it extracted, suspect the extractor.
+
 ---
 
 ## Gate 1 — rebuilt from source
