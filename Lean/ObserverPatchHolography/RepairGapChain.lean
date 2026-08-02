@@ -125,6 +125,59 @@ example :
       spec_eq := fun _ => Iff.rfl }
     7 (by show (5 : Int) ≤ 7; omega)
 
+
+/-- **Non-degenerate certified branch** -- closes a limit this chain's own audit recorded
+    (docs/AUDIT_YM_GAP_CHAIN.md section 4(b), 2026-08-01).
+
+    The witness above establishes that `Certificate` is SATISFIABLE, but it sets H and Lrep
+    to the *same term*, so `spec_eq` discharges by `Iff.rfl`. That is weaker than the
+    situation the paper describes: there H and Lrep are DISTINCT operators related by
+    H = U inv Lrep U (Thm 9.3, eq. 9), whose nonzero spectra coincide only because unitary
+    conjugation preserves the spectrum. A witness in which the two coincide DEFINITIONALLY
+    cannot exhibit that, and so cannot rule out a reading in which the chain is only ever
+    applied to H identical to Lrep.
+
+    Here the predicates are `0 < x - 4` and `5 <= x`: extensionally equal over the integers,
+    but NOT definitionally equal, so `spec_eq` needs an actual arithmetic proof. Verified in
+    BOTH directions before committing -- with `spec_eq := fun _ => Iff.rfl` the file fails to
+    elaborate:
+
+        error: Type mismatch
+          Iff.rfl  has type  ?m <-> ?m
+          but is expected to have type
+          { nonzeroSpec := fun x => 0 < x - 4 }.nonzeroSpec x <->
+          { nonzeroSpec := fun x => 5 <= x }.nonzeroSpec x
+
+    so the non-degeneracy is enforced by the compiler, not asserted in a comment. This is
+    the section-12 shape in miniature: ONE spectrum, TWO presentations. -/
+example : Certificate (α := Int) ⟨fun x => (0 : Int) < x - 4⟩ ⟨fun x => (5 : Int) ≤ x⟩ 1 0 where
+  c_star_pos := by show (0 : Int) < 1; omega
+  Lrep_gap := by
+    intro x hx
+    show (1 : Int) ≤ x
+    have h5 : (5 : Int) ≤ x := hx
+    omega
+  spec_eq := by
+    intro x
+    show (0 : Int) < x - 4 ↔ (5 : Int) ≤ x
+    constructor <;> intro h <;> omega
+
+/-- Sanity on the NON-degenerate branch: the chain still delivers a strictly positive gap,
+    and the spectral value enters through H's own presentation (`0 < 7 - 4`) rather than
+    Lrep's, so the transport across `spec_eq` is actually exercised. -/
+example :
+    lt (0 : Int) 7 :=
+  mass_gap_pos
+    (H := ⟨fun x => (0 : Int) < x - 4⟩) (Lrep := ⟨fun x => (5 : Int) ≤ x⟩)
+    (c_star := 1) (zero := 0)
+    { c_star_pos := by show (0 : Int) < 1; omega
+      Lrep_gap := by intro x hx; show (1 : Int) ≤ x; have : (5:Int) ≤ x := hx; omega
+      spec_eq := by
+        intro x
+        show (0 : Int) < x - 4 ↔ (5 : Int) ≤ x
+        constructor <;> intro h <;> omega }
+    7 (by show (0 : Int) < 7 - 4; omega)
+
 /-! ## Axiom self-audit (build-log visible)
 
 `mass_gap` / `mass_gap_pos` / `gap_eq` are pure logic over the `Certificate`
