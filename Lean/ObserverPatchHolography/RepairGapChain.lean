@@ -178,6 +178,108 @@ example :
         constructor <;> intro h <;> omega }
     7 (by show (0 : Int) < 7 - 4; omega)
 
+
+/-! ## §12 DERIVED, not assumed — closing audit limit (a)
+
+    `gap_eq` returns `cert.spec_eq`: the Lean ASSUMED the spectral equality and restated it,
+    while the paper DERIVES eq. 12 from `U H U⁻¹ = L^rep` (unitary conjugation preserves the
+    spectrum). The audit recorded that as carrying strictly less than §12 does.
+
+    The honest fix is not to delete the field — `Certificate` is a hypothesis bundle and must
+    stay one — but to show the field is DERIVABLE from data more primitive than itself, so a
+    branch can discharge it by proof instead of by assumption.
+
+    The hazard here is a tautology: "conjugate operators have equal spectra" is trivial if
+    `conjugate` is *defined* as "equal spectra". So conjugation is modelled by REINDEXING —
+    a bijection of basis indices carrying each eigenvalue to the same eigenvalue — and the
+    equality of spectra is then a theorem whose proof uses both directions of that bijection. -/
+
+/-- A bijection, spelled out because this file imports no Mathlib. -/
+structure Reindex (β γ : Type) where
+  to : β → γ
+  inv : γ → β
+  left_inv : ∀ b, inv (to b) = b
+  right_inv : ∀ c, to (inv c) = c
+
+/-- An operator presented by its spectral DATA: an index set (a basis) and the eigenvalue
+    carried by each index. Strictly more information than `Op`, which records only the SET. -/
+structure SpectralData (α : Type) where
+  idx : Type
+  val : idx → α
+
+/-- The `Op` induced by spectral data, given the ambient "is a nonzero value" predicate. -/
+def SpectralData.op (nz : α → Prop) (S : SpectralData α) : Op α :=
+  ⟨fun x => nz x ∧ ∃ i, S.val i = x⟩
+
+/-- **Eq. 12, derived.** If `S` and `T` are related by a reindexing that preserves every
+    eigenvalue — the discrete shadow of `U H U⁻¹ = L^rep` — then they have the same nonzero
+    spectrum. Both directions of the bijection are used, which is what makes this a proof
+    rather than a restatement. -/
+theorem spec_eq_of_conj {α : Type} {nz : α → Prop} {S T : SpectralData α}
+    (e : Reindex S.idx T.idx) (hval : ∀ i, S.val i = T.val (e.to i)) :
+    ∀ x, (SpectralData.op nz S).nonzeroSpec x ↔ (SpectralData.op nz T).nonzeroSpec x := by
+  intro x
+  constructor
+  · intro h
+    cases h with
+    | intro hx hex =>
+      cases hex with
+      | intro i hi =>
+        exact ⟨hx, e.to i, by rw [← hval i]; exact hi⟩
+  · intro h
+    cases h with
+    | intro hx hex =>
+      cases hex with
+      | intro j hj =>
+        refine ⟨hx, e.inv j, ?_⟩
+        rw [hval (e.inv j), e.right_inv j]
+        exact hj
+
+/-! ### A branch where §12 is PROVED rather than assumed
+
+    The two operators below carry the SAME two eigenvalues `{5, 7}` attached to the OPPOSITE
+    basis indices, and the reindexing is `not` — genuinely not the identity. So `spec_eq` is
+    obtained by transporting along a bijection, which is the discrete content of
+    "unitary conjugation preserves the spectrum", rather than by hypothesis. -/
+
+/-- Eigenvalue 5 at index `true`, 7 at index `false`. -/
+def Sdata : SpectralData Int := ⟨Bool, fun b => if b then (5 : Int) else 7⟩
+
+/-- The SAME eigenvalues, attached the other way round — a genuinely different assignment. -/
+def Tdata : SpectralData Int := ⟨Bool, fun b => if b then (7 : Int) else 5⟩
+
+/-- These are not the same operator DATA: they disagree at index `true`. Without this the
+    "derivation" could be transporting along the identity and nobody would notice. -/
+theorem Sdata_ne_Tdata : Sdata.val true ≠ Tdata.val true := by decide
+
+/-- `not` as a reindexing: the basis permutation implementing the conjugation. -/
+def swapBool : Reindex Bool Bool where
+  to := not
+  inv := not
+  left_inv := by intro b; cases b <;> rfl
+  right_inv := by intro b; cases b <;> rfl
+
+/-- Every eigenvalue is preserved under the reindexing — the hypothesis `U H U⁻¹ = L^rep`
+    supplies in the real setting. -/
+theorem Sdata_val_eq : ∀ i, Sdata.val i = Tdata.val (swapBool.to i) := by
+  intro i; cases i <;> rfl
+
+/-- **The closure of audit limit (a).** A `Certificate` whose `spec_eq` field is DISCHARGED BY
+    PROOF — `spec_eq_of_conj` applied to a non-identity basis permutation — instead of being
+    assumed. `Certificate` still bundles it as a hypothesis, which is correct for a conditional
+    theorem; what changes is that a branch can now supply it from more primitive data, exactly
+    as the paper derives eq. 12 from `U H U⁻¹ = L^rep`. -/
+example : Certificate (α := Int)
+    (SpectralData.op (fun x => (5 : Int) ≤ x) Sdata)
+    (SpectralData.op (fun x => (5 : Int) ≤ x) Tdata) 1 0 where
+  c_star_pos := by show (0 : Int) < 1; omega
+  Lrep_gap := by
+    intro x hx
+    show (1 : Int) ≤ x
+    have h5 : (5 : Int) ≤ x := hx.1
+    omega
+  spec_eq := spec_eq_of_conj swapBool Sdata_val_eq
+
 /-! ## Axiom self-audit (build-log visible)
 
 `mass_gap` / `mass_gap_pos` / `gap_eq` are pure logic over the `Certificate`
@@ -186,5 +288,6 @@ hypotheses — expected axiom report: NONE (not even propext). -/
 #print axioms mass_gap
 #print axioms mass_gap_pos
 #print axioms gap_eq
+#print axioms spec_eq_of_conj
 
 end ObserverPatchHolography.RepairGapChain
