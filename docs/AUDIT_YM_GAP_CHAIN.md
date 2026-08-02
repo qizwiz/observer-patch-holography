@@ -25,7 +25,8 @@ independent places (paper §11 title, `claims/claim_registry.yaml` tier, Lean mo
 No WEAKER-SIBLING, no MISSING, no aspirational naming. The failure mode this audit exists to
 catch — a green build masking a substituted or weakened statement — is **not present**.
 
-Two scoping limits are recorded in §4. Neither is a defect; both are places where the Lean
+Two scoping limits were recorded in §4; **both are now closed** (`70045153`, `ac7f6d72`). They
+were never defects — both were places where the Lean
 formalises less than the paper text, consistently with its own declared scope.
 
 ---
@@ -178,6 +179,45 @@ The paper *derives* `Δ_YM = Δ_rep` (eq. 12) from `UHU⁻¹ = L^rep`. The Lean 
 the Lean's §12 result carries strictly less than the paper's §12 does, and the docstring's
 "**§12 (exact gap accounting)**" reads stronger than what is proved.
 
+**CLOSED 2026-08-01** (`ac7f6d72`). `spec_eq` is now DERIVABLE rather than only assumable.
+
+The trap here is that the closure is trivial to fake: if "conjugate" is *defined* as "has equal
+spectra", then "conjugate operators have equal spectra" is a tautology wearing a theorem's
+clothes. So conjugation is modelled one level DOWN, where it has content:
+
+| | |
+|---|---|
+| `SpectralData` | an index set (a basis) plus the eigenvalue at each index — strictly more information than `Op`, which records only the resulting SET |
+| `Reindex` | a bijection of indices (spelled out; this file imports no Mathlib) |
+| `spec_eq_of_conj` | **derives** equality of nonzero spectra from a reindexing that preserves every eigenvalue, using BOTH directions of the bijection |
+
+`Certificate` still carries `spec_eq` as a field, and that is correct — it is a hypothesis bundle
+for a *conditional* theorem. What changed is that a branch can now discharge that field **by
+proof**, exactly as the paper derives eq. 12 from `UHU⁻¹ = L^rep`.
+
+The witness is built so the derivation cannot be bypassed: `Sdata` and `Tdata` carry the same two
+eigenvalues `{5, 7}` attached to OPPOSITE indices (`Sdata_ne_Tdata` proves they disagree at index
+`true`), and the permutation is `not`, not the identity. Verified in both directions —
+substituting `spec_eq := fun _ => Iff.rfl` fails to elaborate:
+
+    error: Type mismatch
+      Iff.rfl  has type  ?m ↔ ?m
+      but is expected to have type
+      (SpectralData.op (fun x => 5 ≤ x) Sdata).nonzeroSpec x ↔
+      (SpectralData.op (fun x => 5 ≤ x) Tdata).nonzeroSpec x
+
+— so the transport is load-bearing, not decorative.
+
+Kept **constructive** deliberately: the first proof used `Exists.choose` and measured as
+`depends on axioms: [Classical.choice]`. Every other theorem in the file depends on none, so that
+would have quietly lowered its standard for no gain. Rewritten with `cases`, `spec_eq_of_conj`
+now reports **does not depend on any axioms**, and its `#print axioms` is wired into the
+build-log-visible self-audit block beside the others. `lake build`: 8329 jobs, successful.
+
+**What this does NOT close:** the docstring wording flagged above. `gap_eq` itself still projects
+the field, so "§12 (exact gap accounting)" still reads stronger than that one theorem proves —
+what exists now is a derivation *available* to any branch, not a rewrite of `gap_eq`.
+
 **(b) The non-vacuity witness is degenerate.**
 
 The witness sets `H ≡ Lrep` (literally the same predicate), so `spec_eq := Iff.rfl` holds by
@@ -205,8 +245,7 @@ instead of `Lrep`'s, so the transport across `spec_eq` is exercised rather than 
 `lake build`: 8329 jobs, successful — the same count as this audit — and the axiom reports are
 unchanged (`mass_gap` / `mass_gap_pos` / `gap_eq` depend on no axioms).
 
-Limit **(a)** is unchanged and remains open: `gap_eq` still restates a `Certificate` field
-rather than deriving eq. 12.
+Limit **(a)** was still open at that point. It is now closed too — see §4(a).
 
 ---
 
