@@ -188,6 +188,26 @@ the situation the paper describes (there they are *unitarily conjugate*, `UHU⁻
 A witness with `H` and `Lrep` distinct but spectrally matched would close this, and would be a
 small, self-contained addition.
 
+**CLOSED 2026-08-01** (`70045153`). Added a branch whose two presentations are `0 < x - 4` and
+`5 ≤ x` — extensionally equal over `ℤ`, **not** definitionally equal, so `spec_eq` requires an
+actual arithmetic proof rather than `Iff.rfl`. Verified in BOTH directions before committing:
+with `spec_eq := fun _ => Iff.rfl` the file does not elaborate —
+
+    error: Type mismatch
+      Iff.rfl  has type  ?m ↔ ?m
+      but is expected to have type
+      { nonzeroSpec := fun x => 0 < x - 4 }.nonzeroSpec x ↔
+      { nonzeroSpec := fun x => 5 ≤ x }.nonzeroSpec x
+
+— so the non-degeneracy is enforced by the compiler, not asserted in a comment. The companion
+`mass_gap_pos` check supplies the spectral value through `H`'s own presentation (`0 < 7 - 4`)
+instead of `Lrep`'s, so the transport across `spec_eq` is exercised rather than bypassed.
+`lake build`: 8329 jobs, successful — the same count as this audit — and the axiom reports are
+unchanged (`mass_gap` / `mass_gap_pos` / `gap_eq` depend on no axioms).
+
+Limit **(a)** is unchanged and remains open: `gap_eq` still restates a `Certificate` field
+rather than deriving eq. 12.
+
 ---
 
 ## What this audit does **not** establish
